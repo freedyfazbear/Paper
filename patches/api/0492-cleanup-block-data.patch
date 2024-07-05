@@ -1,0 +1,337 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Lulu13022002 <41980282+Lulu13022002@users.noreply.github.com>
+Date: Sun, 3 Mar 2024 16:02:25 +0100
+Subject: [PATCH] cleanup block data
+
+
+diff --git a/src/main/java/org/bukkit/block/BlockType.java b/src/main/java/org/bukkit/block/BlockType.java
+index 2dd2e10ecbd8a2b07a40a09bb4389717233dfbc1..9129d3ffef4587d0f2e748e7241dd73836f578cb 100644
+--- a/src/main/java/org/bukkit/block/BlockType.java
++++ b/src/main/java/org/bukkit/block/BlockType.java
+@@ -108,6 +108,7 @@ import org.bukkit.block.data.type.TrialSpawner;
+ import org.bukkit.block.data.type.Tripwire;
+ import org.bukkit.block.data.type.TripwireHook;
+ import org.bukkit.block.data.type.TurtleEgg;
++import org.bukkit.block.data.type.Vault;
+ import org.bukkit.block.data.type.Wall;
+ import org.bukkit.block.data.type.WallHangingSign;
+ import org.bukkit.block.data.type.WallSign;
+diff --git a/src/main/java/org/bukkit/block/Orientation.java b/src/main/java/org/bukkit/block/Orientation.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..f6b25ac08db75d4ddec498295b932d8efccdcfd4
+--- /dev/null
++++ b/src/main/java/org/bukkit/block/Orientation.java
+@@ -0,0 +1,20 @@
++package org.bukkit.block;
++
++/**
++ * Represents the face and the direction of a block
++ */
++public enum Orientation {
++
++    DOWN_EAST,
++    DOWN_NORTH,
++    DOWN_SOUTH,
++    DOWN_WEST,
++    UP_EAST,
++    UP_NORTH,
++    UP_SOUTH,
++    UP_WEST,
++    WEST_UP,
++    EAST_UP,
++    NORTH_UP,
++    SOUTH_UP;
++}
+diff --git a/src/main/java/org/bukkit/block/data/type/CaveVinesPlant.java b/src/main/java/org/bukkit/block/data/type/CaveVinesPlant.java
+index a7f75a98e018c63280f49aff1654ed1baea1f97f..2255ed831d0779d140cca5a6ec04f4db5c27ef9f 100644
+--- a/src/main/java/org/bukkit/block/data/type/CaveVinesPlant.java
++++ b/src/main/java/org/bukkit/block/data/type/CaveVinesPlant.java
+@@ -11,8 +11,21 @@ public interface CaveVinesPlant extends BlockData {
+      * Gets the value of the 'berries' property.
+      *
+      * @return the 'berries' value
++     * @deprecated bad name, use {@link #hasBerries()}
+      */
+-    boolean isBerries();
++    // Paper start
++    @Deprecated
++    default boolean isBerries() {
++        return this.hasBerries();
++    }
++
++    /**
++     * Gets the value of the 'berries' property.
++     *
++     * @return the 'berries' value
++     */
++    boolean hasBerries();
++    // Paper end
+ 
+     /**
+      * Sets the value of the 'berries' property.
+diff --git a/src/main/java/org/bukkit/block/data/type/Crafter.java b/src/main/java/org/bukkit/block/data/type/Crafter.java
+index c15fdf9e82cf1793bdcaa9a3a031c9cfa05541bc..d685b38b80cdb40cc061414a9a0bc911a36dd990 100644
+--- a/src/main/java/org/bukkit/block/data/type/Crafter.java
++++ b/src/main/java/org/bukkit/block/data/type/Crafter.java
+@@ -48,18 +48,23 @@ public interface Crafter extends BlockData {
+      * @return the 'orientation' value
+      */
+     @NotNull
+-    Orientation getOrientation();
++    org.bukkit.block.Orientation getOrientation(); // Paper
+ 
+     /**
+      * Sets the value of the 'orientation' property.
+      *
+      * @param orientation the new 'orientation' value
+      */
+-    void setOrientation(@NotNull Orientation orientation);
++    void setOrientation(@NotNull org.bukkit.block.Orientation orientation); // Paper
+ 
+     /**
+      * The directions the Crafter can be oriented.
++     *
++     * @deprecated this property is not specific to the Crafter, use
++     * {@link org.bukkit.block.Orientation} instead. All references
++     * to this enum will be redirected to that enum at runtime.
+      */
++    @Deprecated // Paper
+     public enum Orientation {
+ 
+         DOWN_EAST,
+diff --git a/src/main/java/org/bukkit/block/data/type/DecoratedPot.java b/src/main/java/org/bukkit/block/data/type/DecoratedPot.java
+index b3d290dbfdcbadcbadcb54e6b414e423eba80cc6..66bf4d33d432d4ed7b3de47ceb860d2e68050d99 100644
+--- a/src/main/java/org/bukkit/block/data/type/DecoratedPot.java
++++ b/src/main/java/org/bukkit/block/data/type/DecoratedPot.java
+@@ -6,14 +6,16 @@ import org.bukkit.block.data.Waterlogged;
+ public interface DecoratedPot extends Directional, Waterlogged {
+     // Paper start - add missing block data api
+     /**
+-     * @return whether the pot is cracked
++     * Gets the value of the 'cracked' property.
++     *
++     * @return the 'cracked' value
+      */
+     public boolean isCracked();
+ 
+     /**
+-     * Set whether the pot is cracked.
++     * Sets the value of the 'cracked' property.
+      *
+-     * @param cracked whether the pot is cracked
++     * @param cracked the new 'cracked' value
+      */
+     public void setCracked(boolean cracked);
+     // Paper end - add missing block data api
+diff --git a/src/main/java/org/bukkit/block/data/type/Jigsaw.java b/src/main/java/org/bukkit/block/data/type/Jigsaw.java
+index c70c755cdb36c8afc70988340b061c39c492e14e..9517465a535231e29b0c9b4740f548051a9924d8 100644
+--- a/src/main/java/org/bukkit/block/data/type/Jigsaw.java
++++ b/src/main/java/org/bukkit/block/data/type/Jigsaw.java
+@@ -14,18 +14,23 @@ public interface Jigsaw extends BlockData {
+      * @return the 'orientation' value
+      */
+     @NotNull
+-    Orientation getOrientation();
++    org.bukkit.block.Orientation getOrientation(); // Paper
+ 
+     /**
+      * Sets the value of the 'orientation' property.
+      *
+      * @param orientation the new 'orientation' value
+      */
+-    void setOrientation(@NotNull Orientation orientation);
++    void setOrientation(@NotNull org.bukkit.block.Orientation orientation); // Paper
+ 
+     /**
+      * The directions the Jigsaw can be oriented.
++     *
++     * @deprecated this property is not specific to the Jigsaw, use
++     * {@link org.bukkit.block.Orientation} instead. All references
++     * to this enum will be redirected to that enum at runtime.
+      */
++    @Deprecated // Paper
+     public enum Orientation {
+ 
+         DOWN_EAST,
+diff --git a/src/main/java/org/bukkit/block/data/type/Jukebox.java b/src/main/java/org/bukkit/block/data/type/Jukebox.java
+index 5e37136207e939c6278c6c2589051fc34eca3496..e599824cc4e9c6e32cf37c2301bb767e4bc67dd9 100644
+--- a/src/main/java/org/bukkit/block/data/type/Jukebox.java
++++ b/src/main/java/org/bukkit/block/data/type/Jukebox.java
+@@ -14,4 +14,13 @@ public interface Jukebox extends BlockData {
+      * @return the 'has_record' value
+      */
+     boolean hasRecord();
++
++    // Paper start - missing api
++    /**
++     * Sets the value of the 'has_record' property.
++     *
++     * @param hasRecord the new 'has_record' value
++     */
++    void setHasRecord(boolean hasRecord);
++    // Paper end - missing api
+ }
+diff --git a/src/main/java/org/bukkit/block/data/type/Lectern.java b/src/main/java/org/bukkit/block/data/type/Lectern.java
+index 11b4a173f96e8c7cd92ef0146c3b0cca91e87c90..229577b82b917c7c4aa0e1b8ce66c832c5aca004 100644
+--- a/src/main/java/org/bukkit/block/data/type/Lectern.java
++++ b/src/main/java/org/bukkit/block/data/type/Lectern.java
+@@ -15,4 +15,13 @@ public interface Lectern extends Directional, Powerable {
+      * @return the 'has_book' value
+      */
+     boolean hasBook();
++
++    // Paper start - missing api
++    /**
++     * Sets the value of the 'has_book' property.
++     *
++     * @param hasBook the new 'has_book' value
++     */
++    void setHasBook(boolean hasBook);
++    // Paper end - missing api
+ }
+diff --git a/src/main/java/org/bukkit/block/data/type/SculkSensor.java b/src/main/java/org/bukkit/block/data/type/SculkSensor.java
+index 1af390e2ec3b8d8943c58e64edf8869b1820110f..4d779b676e81bd4cb79a8d8ee56436f2fabff5c0 100644
+--- a/src/main/java/org/bukkit/block/data/type/SculkSensor.java
++++ b/src/main/java/org/bukkit/block/data/type/SculkSensor.java
+@@ -13,16 +13,43 @@ public interface SculkSensor extends AnaloguePowerable, Waterlogged {
+      * Gets the value of the 'sculk_sensor_phase' property.
+      *
+      * @return the 'sculk_sensor_phase' value
++     * @deprecated bad name, use {@link #getSculkSensorPhase()}
+      */
+     @NotNull
+-    Phase getPhase();
++    // Paper start
++    @Deprecated
++    default Phase getPhase() {
++        return this.getSculkSensorPhase();
++    }
++    // Paper end
++
++    /**
++     * Sets the value of the 'sculk_sensor_phase' property.
++     *
++     * @param phase the new 'sculk_sensor_phase' value
++     * @deprecated bad name, use {@link #setSculkSensorPhase(Phase)}
++     */
++    // Paper start
++    @Deprecated
++    default void setPhase(@NotNull Phase phase) {
++        this.setSculkSensorPhase(phase);
++    }
++
++    /**
++     * Gets the value of the 'sculk_sensor_phase' property.
++     *
++     * @return the 'sculk_sensor_phase' value
++     */
++    @NotNull
++    Phase getSculkSensorPhase();
+ 
+     /**
+      * Sets the value of the 'sculk_sensor_phase' property.
+      *
+      * @param phase the new 'sculk_sensor_phase' value
+      */
+-    void setPhase(@NotNull Phase phase);
++    void setSculkSensorPhase(@NotNull Phase phase);
++    // Paper end
+ 
+     /**
+      * The Phase of the sensor.
+diff --git a/src/main/java/org/bukkit/block/data/type/Switch.java b/src/main/java/org/bukkit/block/data/type/Switch.java
+index d91a07c7bcb36b3810bb2db89afef1eefd89253d..f00587773935b72d61d05acffb9c1ec865642c1e 100644
+--- a/src/main/java/org/bukkit/block/data/type/Switch.java
++++ b/src/main/java/org/bukkit/block/data/type/Switch.java
+@@ -7,6 +7,13 @@ import org.jetbrains.annotations.NotNull;
+ 
+ public interface Switch extends Directional, FaceAttachable, Powerable {
+ 
++    // Paper start
++    @NotNull
++    AttachedFace getAttachedFace();
++
++    void setAttachedFace(@NotNull AttachedFace face);
++    // Paper end
++
+     /**
+      * Gets the value of the 'face' property.
+      *
+@@ -14,8 +21,12 @@ public interface Switch extends Directional, FaceAttachable, Powerable {
+      * @deprecated use {@link #getAttachedFace()}
+      */
+     @NotNull
++    // Paper start
+     @Deprecated
+-    Face getFace();
++    default Face getFace() {
++        return Face.valueOf(this.getAttachedFace().name());
++    }
++    // Paper end
+ 
+     /**
+      * Sets the value of the 'face' property.
+@@ -23,8 +34,12 @@ public interface Switch extends Directional, FaceAttachable, Powerable {
+      * @param face the new 'face' value
+      * @deprecated use {@link #setAttachedFace(AttachedFace)}
+      */
++    // Paper start
+     @Deprecated
+-    void setFace(@NotNull Face face);
++    default void setFace(@NotNull Face face) {
++        this.setAttachedFace(AttachedFace.valueOf(face.name()));
++    }
++    // Paper end
+ 
+     /**
+      * The face to which a switch type block is stuck.
+diff --git a/src/main/java/org/bukkit/block/data/type/Vault.java b/src/main/java/org/bukkit/block/data/type/Vault.java
+index 87e46dfb951b6e4b753af7c31efd444e549052b9..a112287376a152089d9d2e2e7bfe8f16da28fbfb 100644
+--- a/src/main/java/org/bukkit/block/data/type/Vault.java
++++ b/src/main/java/org/bukkit/block/data/type/Vault.java
+@@ -14,16 +14,43 @@ public interface Vault extends Directional {
+      * Gets the value of the 'vault_state' property.
+      *
+      * @return the 'vault_state' value
++     * @deprecated use {@link #getVaultState()}
+      */
+     @NotNull
+-    State getTrialSpawnerState();
++    // Paper start
++    @Deprecated
++    default State getTrialSpawnerState() {
++        return this.getVaultState();
++    }
++    // Paper end
++
++    /**
++     * Sets the value of the 'vault_state' property.
++     *
++     * @param state the new 'vault_state' value
++     * @deprecated use {@link #setVaultState(State)}
++     */
++    // Paper start
++    @Deprecated
++    default void setTrialSpawnerState(@NotNull State state) {
++        this.setVaultState(state);
++    }
++
++    /**
++     * Gets the value of the 'vault_state' property.
++     *
++     * @return the 'vault_state' value
++     */
++    @NotNull
++    State getVaultState();
+ 
+     /**
+      * Sets the value of the 'vault_state' property.
+      *
+      * @param state the new 'vault_state' value
+      */
+-    void setTrialSpawnerState(@NotNull State state);
++    void setVaultState(@NotNull State state);
++    // Paper end
+ 
+     /**
+      * Gets the value of the 'ominous' property.

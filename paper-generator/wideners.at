@@ -1,0 +1,17 @@
+public net/minecraft/server/WorldLoader loadAndReplaceLayer(Lnet/minecraft/server/packs/resources/ResourceManager;Lnet/minecraft/core/LayeredRegistryAccess;Lnet/minecraft/server/RegistryLayer;Ljava/util/List;)Lnet/minecraft/core/LayeredRegistryAccess;
+public net/minecraft/world/level/material/MapColor MATERIAL_COLORS
+public net/minecraft/world/level/block/FireBlock igniteOdds
+public net/minecraft/world/level/block/state/properties/IntegerProperty min
+public net/minecraft/util/datafix/fixes/BannerPatternFormatFix PATTERN_ID_MAP
+
+# for auto-marking experimental stuff
+public net/minecraft/core/RegistrySetBuilder entries
+public net/minecraft/core/RegistrySetBuilder$RegistryStub
+public net/minecraft/data/registries/UpdateOneTwentyOneRegistries BUILDER
+public net/minecraft/data/registries/VanillaRegistries BUILDER
+public net/minecraft/world/flag/FeatureFlagRegistry names
+public net/minecraft/world/flag/FeatureFlagSet mask
+public net/minecraft/world/entity/npc/VillagerTrades$TreasureMapForEmeralds
+public net/minecraft/world/entity/npc/VillagerTrades$TreasureMapForEmeralds destination
+public net/minecraft/world/entity/npc/VillagerTrades$TreasureMapForEmeralds destinationType
+public net/minecraft/world/entity/npc/VillagerTrades$TypeSpecificTrade

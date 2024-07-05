@@ -44,19 +44,6 @@ Co-authored-by: FireInstall <kettnerl@hu-berlin.de>
 Co-authored-by: maxcom1 <46265094+maxcom1@users.noreply.github.com>
 Co-authored-by: TotalledZebra <Holappa57@gmail.com>
 
-diff --git a/src/main/java/com/destroystokyo/paper/entity/ai/MobGoalHelper.java b/src/main/java/com/destroystokyo/paper/entity/ai/MobGoalHelper.java
-index c99eafab2103c7f5bca7ffba68a10bd853df055f..f7241c5292f1c012404eea11256813fbc2c2df1a 100644
---- a/src/main/java/com/destroystokyo/paper/entity/ai/MobGoalHelper.java
-+++ b/src/main/java/com/destroystokyo/paper/entity/ai/MobGoalHelper.java
-@@ -164,7 +164,7 @@ public class MobGoalHelper {
-         bukkitMap.put(net.minecraft.world.entity.monster.Endermite.class, Endermite.class);
-         bukkitMap.put(net.minecraft.world.entity.monster.Evoker.class, Evoker.class);
-         bukkitMap.put(AbstractFish.class, Fish.class);
--        bukkitMap.put(AbstractSchoolingFish.class, Fish.class); // close enough
-+        bukkitMap.put(AbstractSchoolingFish.class, io.papermc.paper.entity.SchoolableFish.class);
-         bukkitMap.put(FlyingMob.class, Flying.class);
-         bukkitMap.put(net.minecraft.world.entity.animal.Fox.class, Fox.class);
-         bukkitMap.put(net.minecraft.world.entity.monster.Ghast.class, Ghast.class);
 diff --git a/src/main/java/io/papermc/paper/entity/PaperSchoolableFish.java b/src/main/java/io/papermc/paper/entity/PaperSchoolableFish.java
 new file mode 100644
 index 0000000000000000000000000000000000000000..41bf71d116ffc5431586ce54abba7f8def6c1dcf

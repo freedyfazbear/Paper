@@ -1,0 +1,42 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Lulu13022002 <41980282+Lulu13022002@users.noreply.github.com>
+Date: Sun, 3 Mar 2024 18:05:10 +0100
+Subject: [PATCH] server gen test
+
+
+diff --git a/build.gradle.kts b/build.gradle.kts
+index 12b3cad1ee40fdd9c4386debe9d8af178d274ba2..f06d67177cd0752b0fc732ca5dc11a38d815a97b 100644
+--- a/build.gradle.kts
++++ b/build.gradle.kts
+@@ -186,17 +186,31 @@ fun TaskContainer.registerRunTask(
+ }
+ 
+ // Paper start
++val generatedServerDir: File = rootProject.file("paper-generator/generatedServer")
++
+ sourceSets.main {
+     java {
++        srcDir(generatedServerDir)
+         exclude("excluded/**")
+     }
+ }
+ 
+ idea {
+     module {
++        generatedSourceDirs.add(generatedServerDir)
+         excludeDirs.add(projectDir.resolve("src/main/java/excluded"))
+     }
+ }
++
++val scanJarForOldGeneratedCode = tasks.register("scanJarForOldGeneratedCode", io.papermc.paperweight.tasks.ScanJarForOldGeneratedCode::class) {
++    mcVersion.set(providers.gradleProperty("mcVersion"))
++    annotation.set("Lio/papermc/paper/generated/GeneratedFrom;")
++    jarToScan.set(tasks.jar.flatMap { it.archiveFile })
++    classpath.from(configurations.compileClasspath)
++}
++tasks.check {
++    dependsOn(scanJarForOldGeneratedCode)
++}
+ // Paper end
+ 
+ val runtimeClasspathWithoutVanillaServer = configurations.runtimeClasspath.flatMap { it.elements }

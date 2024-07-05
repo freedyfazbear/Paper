@@ -1,0 +1,122 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Lulu13022002 <41980282+Lulu13022002@users.noreply.github.com>
+Date: Sat, 16 Mar 2024 18:58:41 +0100
+Subject: [PATCH] Code generation marker stub
+
+
+diff --git a/src/main/java/io/papermc/paper/registry/PaperRegistries.java b/src/main/java/io/papermc/paper/registry/PaperRegistries.java
+index 98b096339fe48b2fc8169ae0376e05d59236fc9a..3dca0bc8579eb96cf5e9ad9b9a300a4979215dee 100644
+--- a/src/main/java/io/papermc/paper/registry/PaperRegistries.java
++++ b/src/main/java/io/papermc/paper/registry/PaperRegistries.java
+@@ -71,6 +71,7 @@ public final class PaperRegistries {
+     private static final Map<ResourceKey<?>, RegistryEntry<?, ?>> BY_RESOURCE_KEY;
+     static {
+         REGISTRY_ENTRIES = List.of(
++            // Paper start - Generated/RegistryDefinitions
+             // built-ins
+             writable(Registries.GAME_EVENT, RegistryKey.GAME_EVENT, GameEvent.class, CraftGameEvent::new, PaperGameEventRegistryEntry.PaperBuilder::new),
+             entry(Registries.INSTRUMENT, RegistryKey.INSTRUMENT, MusicInstrument.class, CraftMusicInstrument::new),
+@@ -105,6 +106,7 @@ public final class PaperRegistries {
+             apiOnly(Registries.SOUND_EVENT, RegistryKey.SOUND_EVENT, () -> org.bukkit.Registry.SOUNDS),
+             apiOnly(Registries.MEMORY_MODULE_TYPE, RegistryKey.MEMORY_MODULE_TYPE, () -> (org.bukkit.Registry<MemoryKey<?>>) (org.bukkit.Registry) org.bukkit.Registry.MEMORY_MODULE_TYPE),
+             apiOnly(Registries.FLUID, RegistryKey.FLUID, () -> org.bukkit.Registry.FLUID)
++            // Paper end - Generated/RegistryDefinitions
+         );
+         final Map<RegistryKey<?>, RegistryEntry<?, ?>> byRegistryKey = new IdentityHashMap<>(REGISTRY_ENTRIES.size());
+         final Map<ResourceKey<?>, RegistryEntry<?, ?>> byResourceKey = new IdentityHashMap<>(REGISTRY_ENTRIES.size());
+diff --git a/src/main/java/org/bukkit/craftbukkit/CraftStatistic.java b/src/main/java/org/bukkit/craftbukkit/CraftStatistic.java
+index ccee1f637db5b8c34a5c125938edaa1361233e4d..c3c6ac5afe9ac09bcd20d51b8b97295323b644e9 100644
+--- a/src/main/java/org/bukkit/craftbukkit/CraftStatistic.java
++++ b/src/main/java/org/bukkit/craftbukkit/CraftStatistic.java
+@@ -20,6 +20,7 @@ import org.bukkit.craftbukkit.inventory.CraftItemType;
+ import org.bukkit.entity.EntityType;
+ 
+ public enum CraftStatistic {
++    // Paper start - Generated/CraftStatisticCustom
+     DAMAGE_DEALT(Stats.DAMAGE_DEALT),
+     DAMAGE_TAKEN(Stats.DAMAGE_TAKEN),
+     DEATHS(Stats.DEATHS),
+@@ -102,7 +103,10 @@ public enum CraftStatistic {
+     INTERACT_WITH_GRINDSTONE(Stats.INTERACT_WITH_GRINDSTONE),
+     TARGET_HIT(Stats.TARGET_HIT),
+     INTERACT_WITH_SMITHING_TABLE(Stats.INTERACT_WITH_SMITHING_TABLE),
++    // Paper end - Generated/CraftStatisticCustom
++    // Paper start - Generated/CraftStatisticType
+     STRIDER_ONE_CM(Stats.STRIDER_ONE_CM);
++    // Paper end - Generated/CraftStatisticType
+     private final ResourceLocation minecraftKey;
+     private final org.bukkit.Statistic bukkit;
+     private static final BiMap<ResourceLocation, org.bukkit.Statistic> statistics;
+diff --git a/src/main/java/org/bukkit/craftbukkit/block/CraftBlockStates.java b/src/main/java/org/bukkit/craftbukkit/block/CraftBlockStates.java
+index b7ff7af2513204b151340538d50a65c850bdb75f..01d340c6420db07c3093d997f6ed6ede79e2443e 100644
+--- a/src/main/java/org/bukkit/craftbukkit/block/CraftBlockStates.java
++++ b/src/main/java/org/bukkit/craftbukkit/block/CraftBlockStates.java
+@@ -132,7 +132,7 @@ public final class CraftBlockStates {
+     // Paper end
+ 
+     static {
+-        // Paper start - simplify
++        // Paper start - Generated/CraftBlockEntityStates
+         register(BlockEntityType.SIGN, CraftSign.class, CraftSign::new);
+         register(BlockEntityType.HANGING_SIGN, CraftHangingSign.class, CraftHangingSign::new);
+         register(BlockEntityType.SKULL, CraftSkull.class, CraftSkull::new);
+@@ -177,7 +177,7 @@ public final class CraftBlockStates {
+         register(BlockEntityType.CRAFTER, CraftCrafter.class, CraftCrafter::new);
+         register(BlockEntityType.TRIAL_SPAWNER, CraftTrialSpawner.class, CraftTrialSpawner::new);
+         register(BlockEntityType.VAULT, CraftVault.class, CraftVault::new);
+-        // Paper end
++        // Paper end - Generated/CraftBlockEntityStates
+     }
+ 
+     private static void register(Material blockType, BlockStateFactory<?> factory) {
+diff --git a/src/main/java/org/bukkit/craftbukkit/block/data/CraftBlockData.java b/src/main/java/org/bukkit/craftbukkit/block/data/CraftBlockData.java
+index 4ca987f83d78aaf2ea7be451b1cb4afefa85feda..d2462e5aba30ee46bdbe0be22cce47f435ce27e7 100644
+--- a/src/main/java/org/bukkit/craftbukkit/block/data/CraftBlockData.java
++++ b/src/main/java/org/bukkit/craftbukkit/block/data/CraftBlockData.java
+@@ -366,6 +366,7 @@ public class CraftBlockData implements BlockData {
+ 
+     static {
+         //<editor-fold desc="CraftBlockData Registration" defaultstate="collapsed">
++        // Paper start - Generated/CraftBlockData#MAP
+         register(net.minecraft.world.level.block.AmethystClusterBlock.class, org.bukkit.craftbukkit.block.impl.CraftAmethystCluster::new);
+         register(net.minecraft.world.level.block.BigDripleafBlock.class, org.bukkit.craftbukkit.block.impl.CraftBigDripleaf::new);
+         register(net.minecraft.world.level.block.BigDripleafStemBlock.class, org.bukkit.craftbukkit.block.impl.CraftBigDripleafStem::new);
+@@ -539,6 +540,7 @@ public class CraftBlockData implements BlockData {
+         register(net.minecraft.world.level.block.piston.PistonBaseBlock.class, org.bukkit.craftbukkit.block.impl.CraftPistonBase::new);
+         register(net.minecraft.world.level.block.piston.PistonHeadBlock.class, org.bukkit.craftbukkit.block.impl.CraftPistonHead::new);
+         register(net.minecraft.world.level.block.piston.MovingPistonBlock.class, org.bukkit.craftbukkit.block.impl.CraftMovingPiston::new);
++        // Paper end - Generated/CraftBlockData#MAP
+         //</editor-fold>
+     }
+ 
+diff --git a/src/main/java/org/bukkit/craftbukkit/potion/CraftPotionUtil.java b/src/main/java/org/bukkit/craftbukkit/potion/CraftPotionUtil.java
+index cb11f0624e4e65aa06bfaaec90729ee536cd53a0..aa3a923a61146702736c9ffb5bdea64b1552efa5 100644
+--- a/src/main/java/org/bukkit/craftbukkit/potion/CraftPotionUtil.java
++++ b/src/main/java/org/bukkit/craftbukkit/potion/CraftPotionUtil.java
+@@ -14,6 +14,7 @@ import org.bukkit.potion.PotionType;
+ public class CraftPotionUtil {
+ 
+     private static final BiMap<PotionType, PotionType> upgradeable = ImmutableBiMap.<PotionType, PotionType>builder()
++            // Paper start - Generated/CraftPotionUtil#upgradeable
+             .put(PotionType.LEAPING, PotionType.STRONG_LEAPING)
+             .put(PotionType.SWIFTNESS, PotionType.STRONG_SWIFTNESS)
+             .put(PotionType.HEALING, PotionType.STRONG_HEALING)
+@@ -23,8 +24,10 @@ public class CraftPotionUtil {
+             .put(PotionType.STRENGTH, PotionType.STRONG_STRENGTH)
+             .put(PotionType.SLOWNESS, PotionType.STRONG_SLOWNESS)
+             .put(PotionType.TURTLE_MASTER, PotionType.STRONG_TURTLE_MASTER)
++            // Paper end - Generated/CraftPotionUtil#upgradeable
+             .build();
+     private static final BiMap<PotionType, PotionType> extendable = ImmutableBiMap.<PotionType, PotionType>builder()
++            // Paper start - Generated/CraftPotionUtil#extendable
+             .put(PotionType.NIGHT_VISION, PotionType.LONG_NIGHT_VISION)
+             .put(PotionType.INVISIBILITY, PotionType.LONG_INVISIBILITY)
+             .put(PotionType.LEAPING, PotionType.LONG_LEAPING)
+@@ -38,6 +41,7 @@ public class CraftPotionUtil {
+             .put(PotionType.WEAKNESS, PotionType.LONG_WEAKNESS)
+             .put(PotionType.TURTLE_MASTER, PotionType.LONG_TURTLE_MASTER)
+             .put(PotionType.SLOW_FALLING, PotionType.LONG_SLOW_FALLING)
++            // Paper end - Generated/CraftPotionUtil#extendable
+             .build();
+ 
+     public static PotionType fromBukkit(PotionData data) {

@@ -1,0 +1,69 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Lulu13022002 <41980282+Lulu13022002@users.noreply.github.com>
+Date: Wed, 11 Sep 2024 20:24:30 +0200
+Subject: [PATCH] fix memory keys use of generics
+
+
+diff --git a/src/main/java/org/bukkit/Registry.java b/src/main/java/org/bukkit/Registry.java
+index d81f687cba38ec930c555b001afc0df93c21731b..16bc5fc536a89866c348f18ddc4a93b3982bbd78 100644
+--- a/src/main/java/org/bukkit/Registry.java
++++ b/src/main/java/org/bukkit/Registry.java
+@@ -279,23 +279,23 @@ public interface Registry<T extends Keyed> extends Iterable<T> {
+      *
+      * @see MemoryKey
+      */
+-    Registry<MemoryKey> MEMORY_MODULE_TYPE = new Registry<MemoryKey>() {
++    Registry<MemoryKey<?>> MEMORY_MODULE_TYPE = new Registry<>() {
+ 
+         @NotNull
+         @Override
+-        public Iterator iterator() {
++        public Iterator<MemoryKey<?>> iterator() {
+             return MemoryKey.values().iterator();
+         }
+ 
+         @Nullable
+         @Override
+-        public MemoryKey get(@NotNull NamespacedKey key) {
++        public MemoryKey<?> get(@NotNull NamespacedKey key) {
+             return MemoryKey.getByKey(key);
+         }
+ 
+         @NotNull
+         @Override
+-        public Stream<MemoryKey> stream() {
++        public Stream<MemoryKey<?>> stream() {
+             return StreamSupport.stream(spliterator(), false);
+         }
+     };
+diff --git a/src/main/java/org/bukkit/entity/memory/MemoryKey.java b/src/main/java/org/bukkit/entity/memory/MemoryKey.java
+index d615c006c9153fb65024241604b744fbfc383efc..b757aed1bde330d8720a900f8e0877f77ef14c4a 100644
+--- a/src/main/java/org/bukkit/entity/memory/MemoryKey.java
++++ b/src/main/java/org/bukkit/entity/memory/MemoryKey.java
+@@ -44,7 +44,7 @@ public final class MemoryKey<T> implements Keyed {
+         return tClass;
+     }
+ 
+-    private static final Map<NamespacedKey, MemoryKey> MEMORY_KEYS = new HashMap<>();
++    private static final Map<NamespacedKey, MemoryKey<?>> MEMORY_KEYS = new HashMap<>();
+     //
+     public static final MemoryKey<Location> HOME = new MemoryKey<>(NamespacedKey.minecraft("home"), Location.class);
+     public static final MemoryKey<Location> POTENTIAL_JOB_SITE = new MemoryKey<>(NamespacedKey.minecraft("potential_job_site"), Location.class);
+@@ -86,7 +86,7 @@ public final class MemoryKey<T> implements Keyed {
+      * available under that key
+      */
+     @Nullable
+-    public static MemoryKey getByKey(@NotNull NamespacedKey namespacedKey) {
++    public static MemoryKey<?> getByKey(@NotNull NamespacedKey namespacedKey) {
+         return MEMORY_KEYS.get(namespacedKey);
+     }
+ 
+@@ -96,7 +96,7 @@ public final class MemoryKey<T> implements Keyed {
+      * @return the memoryKeys
+      */
+     @NotNull
+-    public static Set<MemoryKey> values() {
++    public static Set<MemoryKey<?>> values() {
+         return new HashSet<>(MEMORY_KEYS.values());
+     }
+ }

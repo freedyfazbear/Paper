@@ -7,7 +7,7 @@ Currently includes generated key holder classes for types
 used in the Registry Modification API
 
 diff --git a/build.gradle.kts b/build.gradle.kts
-index 768024b2b4584fd7dd86f068c0e79c89ffc5faa1..f11a22ab01e97e51619c96f2d8a78a99297efc59 100644
+index 768024b2b4584fd7dd86f068c0e79c89ffc5faa1..40c101b49d1a0d3ab5665c3440f3f343482fff5b 100644
 --- a/build.gradle.kts
 +++ b/build.gradle.kts
 @@ -1,6 +1,7 @@
@@ -23,16 +23,16 @@ index 768024b2b4584fd7dd86f068c0e79c89ffc5faa1..f11a22ab01e97e51619c96f2d8a78a99
  }
  
 +// Paper start
-+val generatedApiPath: java.nio.file.Path = rootProject.projectDir.toPath().resolve("paper-api-generator/generated")
++val generatedApiDir: File = rootProject.file("paper-generator/generatedApi")
 +idea {
 +    module {
-+        generatedSourceDirs.add(generatedApiPath.toFile())
++        generatedSourceDirs.add(generatedApiDir)
 +    }
 +}
 +sourceSets {
 +    main {
 +        java {
-+            srcDir(generatedApiPath)
++            srcDir(generatedApiDir)
 +        }
 +    }
 +}
@@ -41,7 +41,7 @@ index 768024b2b4584fd7dd86f068c0e79c89ffc5faa1..f11a22ab01e97e51619c96f2d8a78a99
  configure<PublishingExtension> {
      publications.create<MavenPublication>("maven") {
          from(components["java"])
-@@ -121,3 +138,14 @@ tasks.check {
+@@ -121,3 +138,15 @@ tasks.check {
      dependsOn(scanJar)
  }
  // Paper end
@@ -54,6 +54,7 @@ index 768024b2b4584fd7dd86f068c0e79c89ffc5faa1..f11a22ab01e97e51619c96f2d8a78a99
 +}
 +tasks.check {
 +    dependsOn(scanJarForOldGeneratedCode)
++    dependsOn(":paper-generator:scanOldGeneratedSourceCode")
 +}
 +// Paper end
 diff --git a/src/main/java/io/papermc/paper/generated/GeneratedFrom.java b/src/main/java/io/papermc/paper/generated/GeneratedFrom.java

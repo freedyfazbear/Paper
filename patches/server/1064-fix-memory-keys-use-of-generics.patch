@@ -1,0 +1,19 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Lulu13022002 <41980282+Lulu13022002@users.noreply.github.com>
+Date: Wed, 11 Sep 2024 20:36:46 +0200
+Subject: [PATCH] fix memory keys use of generics
+
+
+diff --git a/src/main/java/org/bukkit/craftbukkit/entity/memory/CraftMemoryKey.java b/src/main/java/org/bukkit/craftbukkit/entity/memory/CraftMemoryKey.java
+index 43cd5ef2dce9fb5b82529db2a1a712f6a517cc5c..291a19c39b0a6d2877d6183bbd9ca36578609c53 100644
+--- a/src/main/java/org/bukkit/craftbukkit/entity/memory/CraftMemoryKey.java
++++ b/src/main/java/org/bukkit/craftbukkit/entity/memory/CraftMemoryKey.java
+@@ -17,7 +17,7 @@ public final class CraftMemoryKey {
+         }
+ 
+         net.minecraft.core.Registry<MemoryModuleType<?>> registry = CraftRegistry.getMinecraftRegistry(Registries.MEMORY_MODULE_TYPE);
+-        MemoryKey<U> bukkit = Registry.MEMORY_MODULE_TYPE.get(CraftNamespacedKey.fromMinecraft(registry.getResourceKey(minecraft).orElseThrow().location()));
++        MemoryKey<U> bukkit = (MemoryKey<U>) Registry.MEMORY_MODULE_TYPE.get(CraftNamespacedKey.fromMinecraft(registry.getResourceKey(minecraft).orElseThrow().location()));
+ 
+         return bukkit;
+     }
