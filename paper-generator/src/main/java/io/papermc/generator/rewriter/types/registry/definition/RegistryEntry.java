@@ -18,9 +18,9 @@ import java.util.function.Function;
 public final class RegistryEntry<T> {
 
     private final ResourceKey<? extends Registry<T>> registryKey;
+    private final RegistryField<T> registryField;
     private final Class<T> registryElementClass;
     private final @Nullable Class<?> registryConstantClass;
-    private final String registryKeyField;
 
     private final Class<?> apiClass;
     private final String implClass;
@@ -34,11 +34,11 @@ public final class RegistryEntry<T> {
 
     private @Nullable Map<ResourceKey<T>, String> fieldNames;
 
-    public RegistryEntry(ResourceKey<? extends Registry<T>> registryKey, Class<T> registryElementClass, @Nullable Class<?> registryConstantClass, String registryKeyField, Class<?> apiClass, String implClass) {
+    public RegistryEntry(ResourceKey<? extends Registry<T>> registryKey, RegistryField<T> registryField, @Nullable Class<?> registryConstantClass, Class<?> apiClass, String implClass) {
         this.registryKey = registryKey;
-        this.registryElementClass = registryElementClass;
+        this.registryField = registryField;
+        this.registryElementClass = registryField.elementClass();
         this.registryConstantClass = registryConstantClass;
-        this.registryKeyField = registryKeyField;
         this.apiClass = apiClass;
         this.implClass = implClass;
     }
@@ -52,7 +52,7 @@ public final class RegistryEntry<T> {
     }
 
     public String registryKeyField() {
-        return this.registryKeyField;
+        return this.registryField.fieldName();
     }
 
     public Class<?> apiClass() {
@@ -172,7 +172,7 @@ public final class RegistryEntry<T> {
     public String toString() {
         return "RegistryEntry[" +
             "registryKey=" + this.registryKey + ", " +
-            "apiRegistryKey=" + this.registryKeyField + ", " +
+            "registryField=" + this.registryField + ", " +
             "apiClass=" + this.apiClass + ", " +
             "implClass=" + this.implClass + ", " +
             ']';

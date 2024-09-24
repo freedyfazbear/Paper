@@ -72,21 +72,21 @@ import java.util.function.Consumer;
 
 public final class RegistryEntries {
 
-    private static <T> RegistryEntry<T> entry(ResourceKey<? extends Registry<T>> registryKey, @Nullable Class<?> registryConstantClass, String registryKeyField, Class<?> apiClass, String implClass) {
-        return new RegistryEntry<>(registryKey, (Class<T>) REGISTRY_KEY_TO_ELEMENT_CLASS.get(registryKey), registryConstantClass, registryKeyField, apiClass, implClass);
+    private static <T> RegistryEntry<T> entry(ResourceKey<? extends Registry<T>> registryKey, @Nullable Class<?> registryConstantClass, Class<?> apiClass, String implClass) {
+        return new RegistryEntry<>(registryKey, (RegistryField<T>) REGISTRY_KEY_TO_FIELD.get(registryKey), registryConstantClass, apiClass, implClass);
     }
 
     // CraftBukkit entry where implementation start by "Craft"
-    private static <T> RegistryEntry<T> entry(ResourceKey<? extends Registry<T>> registryKey, @Nullable Class<?> registryConstantClass, String registryKeyField, Class<?> apiClass) {
-        return entry(registryKey, registryConstantClass, registryKeyField, "Craft", apiClass);
+    private static <T> RegistryEntry<T> entry(ResourceKey<? extends Registry<T>> registryKey, @Nullable Class<?> registryConstantClass, Class<?> apiClass) {
+        return entry(registryKey, registryConstantClass, "Craft", apiClass);
     }
 
-    private static <T> RegistryEntry<T> entry(ResourceKey<? extends Registry<T>> registryKey, @Nullable Class<?> registryConstantClass, String registryKeyField, String implPrefix, Class<?> apiClass) {
+    private static <T> RegistryEntry<T> entry(ResourceKey<? extends Registry<T>> registryKey, @Nullable Class<?> registryConstantClass, String implPrefix, Class<?> apiClass) {
         String name = io.papermc.typewriter.utils.ClassHelper.retrieveFullNestedName(apiClass);
-        Class<T> registryElementClass = (Class<T>) REGISTRY_KEY_TO_ELEMENT_CLASS.get(registryKey);
+        RegistryField<T> registryField = (RegistryField<T>) REGISTRY_KEY_TO_FIELD.get(registryKey);
         String[] classes = name.split("\\.");
         if (classes.length == 0) {
-            return new RegistryEntry<>(registryKey, registryElementClass, registryConstantClass, registryKeyField, apiClass, implPrefix.concat(apiClass.getSimpleName()));
+            return new RegistryEntry<>(registryKey, registryField, registryConstantClass, apiClass, implPrefix.concat(apiClass.getSimpleName()));
         }
 
         StringBuilder implName = new StringBuilder(name.length() + implPrefix.length() * classes.length);
@@ -96,12 +96,12 @@ public final class RegistryEntries {
             implName.append(implPrefix.concat(classes[i]));
         }
 
-        return new RegistryEntry<>(registryKey, registryElementClass, registryConstantClass, registryKeyField, apiClass,implName.toString());
+        return new RegistryEntry<>(registryKey, registryField, registryConstantClass, apiClass,implName.toString());
     }
 
-    private static final Map<ResourceKey<? extends Registry<?>>, Class<?>> REGISTRY_KEY_TO_ELEMENT_CLASS;
+    private static final Map<ResourceKey<? extends Registry<?>>, RegistryField<?>> REGISTRY_KEY_TO_FIELD;
     static {
-        Map<ResourceKey<? extends Registry<?>>, Class<?>> registryKeyToElementClass = new IdentityHashMap<>();
+        Map<ResourceKey<? extends Registry<?>>, RegistryField<?>> registryKeyToField = new IdentityHashMap<>();
         try {
             for (final Field field : Registries.class.getDeclaredFields()) {
                 if (!ResourceKey.class.isAssignableFrom(field.getType())) {
@@ -111,14 +111,14 @@ public final class RegistryEntries {
                 if (ClassHelper.isStaticConstant(field, Modifier.PUBLIC)) {
                     @Nullable Type elementType = ClassHelper.getNestedTypeParameter(field.getGenericType(), ResourceKey.class, Registry.class, null);
                     if (elementType != null) {
-                        registryKeyToElementClass.put(((ResourceKey<? extends Registry<?>>) field.get(null)), ClassHelper.eraseType(elementType));
+                        registryKeyToField.put(((ResourceKey<? extends Registry<?>>) field.get(null)), new RegistryField<>(ClassHelper.eraseType(elementType), field.getName()));
                     }
                 }
             }
         } catch (ReflectiveOperationException ex) {
             throw new RuntimeException(ex);
         }
-        REGISTRY_KEY_TO_ELEMENT_CLASS = Collections.unmodifiableMap(registryKeyToElementClass);
+        REGISTRY_KEY_TO_FIELD = Collections.unmodifiableMap(registryKeyToField);
     }
 
     public static final Set<Class<?>> REGISTRY_CLASS_NAME_BASED_ON_API = Set.of(
@@ -127,41 +127,41 @@ public final class RegistryEntries {
     );
 
     public static final List<RegistryEntry<?>> BUILT_IN = List.of(
-        entry(Registries.GAME_EVENT, net.minecraft.world.level.gameevent.GameEvent.class, "GAME_EVENT", GameEvent.class).apiRegistryBuilder(GameEventRegistryEntry.Builder.class, "PaperGameEventRegistryEntry.PaperBuilder"),
-        entry(Registries.INSTRUMENT, Instruments.class, "INSTRUMENT", MusicInstrument.class),
-        entry(Registries.MOB_EFFECT, MobEffects.class, "MOB_EFFECT", PotionEffectType.class),
-        entry(Registries.STRUCTURE_TYPE, net.minecraft.world.level.levelgen.structure.StructureType.class, "STRUCTURE_TYPE", StructureType.class),
-        entry(Registries.BLOCK, Blocks.class, "BLOCK", BlockType.class),
-        entry(Registries.ITEM, Items.class, "ITEM", ItemType.class),
-        entry(Registries.CAT_VARIANT, CatVariant.class, "CAT_VARIANT", Cat.Type.class),
-        entry(Registries.FROG_VARIANT, FrogVariant.class, "FROG_VARIANT", Frog.Variant.class),
-        entry(Registries.VILLAGER_PROFESSION, VillagerProfession.class, "VILLAGER_PROFESSION", Villager.Profession.class),
-        entry(Registries.VILLAGER_TYPE, VillagerType.class, "VILLAGER_TYPE", Villager.Type.class),
-        entry(Registries.MAP_DECORATION_TYPE, MapDecorationTypes.class, "MAP_DECORATION_TYPE", MapCursor.Type.class),
-        entry(Registries.MENU, net.minecraft.world.inventory.MenuType.class, "MENU", MenuType.class)
+        entry(Registries.GAME_EVENT, net.minecraft.world.level.gameevent.GameEvent.class, GameEvent.class).apiRegistryBuilder(GameEventRegistryEntry.Builder.class, "PaperGameEventRegistryEntry.PaperBuilder"),
+        entry(Registries.STRUCTURE_TYPE, net.minecraft.world.level.levelgen.structure.StructureType.class, StructureType.class),
+        entry(Registries.INSTRUMENT, Instruments.class, MusicInstrument.class),
+        entry(Registries.MOB_EFFECT, MobEffects.class, PotionEffectType.class),
+        entry(Registries.BLOCK, Blocks.class, BlockType.class),
+        entry(Registries.ITEM, Items.class, ItemType.class),
+        entry(Registries.CAT_VARIANT, CatVariant.class, Cat.Type.class),
+        entry(Registries.FROG_VARIANT, FrogVariant.class, Frog.Variant.class),
+        entry(Registries.VILLAGER_PROFESSION, VillagerProfession.class, Villager.Profession.class),
+        entry(Registries.VILLAGER_TYPE, VillagerType.class, Villager.Type.class),
+        entry(Registries.MAP_DECORATION_TYPE, MapDecorationTypes.class, MapCursor.Type.class),
+        entry(Registries.MENU, net.minecraft.world.inventory.MenuType.class, MenuType.class)
     );
 
     public static final List<RegistryEntry<?>> DATA_DRIVEN = List.of(
-        entry(Registries.STRUCTURE, null, "STRUCTURE", Structure.class).delayed(),
-        entry(Registries.TRIM_MATERIAL, TrimMaterials.class, "TRIM_MATERIAL", TrimMaterial.class).delayed(),
-        entry(Registries.TRIM_PATTERN, TrimPatterns.class, "TRIM_PATTERN", TrimPattern.class).delayed(),
-        entry(Registries.DAMAGE_TYPE, DamageTypes.class, "DAMAGE_TYPE", DamageType.class).delayed(),
-        entry(Registries.WOLF_VARIANT, WolfVariants.class, "WOLF_VARIANT", Wolf.Variant.class).delayed(),
-        entry(Registries.ENCHANTMENT, Enchantments.class, "ENCHANTMENT", Enchantment.class).apiRegistryBuilder(EnchantmentRegistryEntry.Builder.class, "PaperEnchantmentRegistryEntry.PaperBuilder").withSerializationUpdater("ENCHANTMENT_RENAME").delayed(),
-        entry(Registries.JUKEBOX_SONG, JukeboxSongs.class, "JUKEBOX_SONG", JukeboxSong.class).delayed(),
-        entry(Registries.BANNER_PATTERN, BannerPatterns.class, "BANNER_PATTERN", PatternType.class).delayed()
+        entry(Registries.STRUCTURE, null, Structure.class).delayed(),
+        entry(Registries.TRIM_MATERIAL, TrimMaterials.class, TrimMaterial.class).delayed(),
+        entry(Registries.TRIM_PATTERN, TrimPatterns.class, TrimPattern.class).delayed(),
+        entry(Registries.DAMAGE_TYPE, DamageTypes.class, DamageType.class).delayed(),
+        entry(Registries.WOLF_VARIANT, WolfVariants.class, Wolf.Variant.class).delayed(),
+        entry(Registries.ENCHANTMENT, Enchantments.class, Enchantment.class).apiRegistryBuilder(EnchantmentRegistryEntry.Builder.class, "PaperEnchantmentRegistryEntry.PaperBuilder").withSerializationUpdater("ENCHANTMENT_RENAME").delayed(),
+        entry(Registries.JUKEBOX_SONG, JukeboxSongs.class, JukeboxSong.class).delayed(),
+        entry(Registries.BANNER_PATTERN, BannerPatterns.class, PatternType.class).delayed()
     );
 
     public static final List<RegistryEntry<?>> API_ONLY = List.of(
-        entry(Registries.BIOME, Biomes.class, "BIOME", Biome.class),
-        entry(Registries.PAINTING_VARIANT, PaintingVariants.class, "PAINTING_VARIANT", Art.class).apiRegistryField("ART"),
-        entry(Registries.ATTRIBUTE, Attributes.class, "ATTRIBUTE", Attribute.class),
-        entry(Registries.ENTITY_TYPE, net.minecraft.world.entity.EntityType.class, "ENTITY_TYPE", EntityType.class),
-        entry(Registries.PARTICLE_TYPE, ParticleTypes.class, "PARTICLE_TYPE", Particle.class),
-        entry(Registries.POTION, Potions.class, "POTION", PotionType.class),
-        entry(Registries.SOUND_EVENT, SoundEvents.class, "SOUND_EVENT", Sound.class).apiRegistryField("SOUNDS"),
-        entry(Registries.MEMORY_MODULE_TYPE, MemoryModuleType.class, "MEMORY_MODULE_TYPE", MemoryKey.class),
-        entry(Registries.FLUID, Fluids.class, "FLUID", Fluid.class)
+        entry(Registries.BIOME, Biomes.class, Biome.class),
+        entry(Registries.PAINTING_VARIANT, PaintingVariants.class, Art.class).apiRegistryField("ART"),
+        entry(Registries.ATTRIBUTE, Attributes.class, Attribute.class),
+        entry(Registries.ENTITY_TYPE, net.minecraft.world.entity.EntityType.class, EntityType.class),
+        entry(Registries.PARTICLE_TYPE, ParticleTypes.class, Particle.class),
+        entry(Registries.POTION, Potions.class, PotionType.class),
+        entry(Registries.SOUND_EVENT, SoundEvents.class, Sound.class).apiRegistryField("SOUNDS"),
+        entry(Registries.MEMORY_MODULE_TYPE, MemoryModuleType.class, MemoryKey.class),
+        entry(Registries.FLUID, Fluids.class, Fluid.class)
     );
 
     public static final Map<ResourceKey<? extends Registry<?>>, RegistryEntry<?>> BY_REGISTRY_KEY;
@@ -169,10 +169,7 @@ public final class RegistryEntries {
         Map<ResourceKey<? extends Registry<?>>, RegistryEntry<?>> byRegistryKey = new IdentityHashMap<>(BUILT_IN.size() + DATA_DRIVEN.size() + API_ONLY.size());
         forEach(entry -> {
             byRegistryKey.put(entry.registryKey(), entry);
-        });
-        for (RegistryEntry<?> entry : RegistryEntries.API_ONLY) {
-            byRegistryKey.put(entry.registryKey(), entry);
-        }
+        }, RegistryEntries.BUILT_IN, RegistryEntries.DATA_DRIVEN, RegistryEntries.API_ONLY);
         BY_REGISTRY_KEY = Collections.unmodifiableMap(byRegistryKey);
     }
 
@@ -183,11 +180,15 @@ public final class RegistryEntries {
 
     // real registries
     public static void forEach(Consumer<RegistryEntry<?>> callback) {
-        for (RegistryEntry<?> entry : RegistryEntries.BUILT_IN) {
-            callback.accept(entry);
-        }
-        for (RegistryEntry<?> entry : RegistryEntries.DATA_DRIVEN) {
-            callback.accept(entry);
+        forEach(callback, RegistryEntries.BUILT_IN, RegistryEntries.DATA_DRIVEN);
+    }
+
+    @SafeVarargs
+    public static void forEach(Consumer<RegistryEntry<?>> callback, List<RegistryEntry<?>>... datas) {
+        for (List<RegistryEntry<?>> data : datas) {
+            for (RegistryEntry<?> entry : data) {
+                callback.accept(entry);
+            }
         }
     }
 

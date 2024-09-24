@@ -23,8 +23,7 @@ public final class ClassHelper {
         return interfaces;
     }
 
-    @Nullable
-    public static Type getNestedTypeParameter(Type type, Class<?>... classes) {
+    public static @Nullable Type getNestedTypeParameter(Type type, Class<?>... classes) {
         for (Class<?> clazz : classes) {
             if (!(type instanceof ParameterizedType complexType)) {
                 return null;
