@@ -38,7 +38,7 @@ public class MSPTCommand extends Command {
         times.addAll(eval(server.tickTimes10s.getTimes()));
         times.addAll(eval(server.tickTimes60s.getTimes()));
 
-        sender.sendMessage("§6Tiki serwera §e(§7avg§e/§7min§e/§7max§e)§6 from last 5s§7,§6 10s§7,§6 1m§e:");
+        sender.sendMessage("§6Tiki serwera test §e(§7avg§e/§7min§e/§7max§e)§6 from last 5s§7,§6 10s§7,§6 1m§e:");
         sender.sendMessage(String.format("§6◴ %s§7/%s§7/%s§e, %s§7/%s§7/%s§e, %s§7/%s§7/%s", times.toArray()));
         return true;
     }
